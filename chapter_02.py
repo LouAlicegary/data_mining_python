@@ -26,6 +26,22 @@ def manhattan(rating1, rating2):
 
 
 
+# Computes the Minkowski distance. Both rating1 and rating2 are dictionaries of the form
+# {'The Strokes': 3.0, 'Slightly Stoopid': 2.5 ...}
+# r = 1 is Manhattan distance; r = 2 is Euclidian distance; r = oo is Supremum distance
+
+def minkowski(rating1, rating2, r):
+
+  distance = 0
+ 
+  for key in rating1:
+    if key in rating2:
+      distance += pow(abs(rating1[key] - rating2[key]), r)
+ 
+  return pow(distance, 1/r)
+
+
+
 # Creates a sorted list of users based on their distance to username
 
 def computeNearestNeighbor(username, users):
@@ -34,7 +50,7 @@ def computeNearestNeighbor(username, users):
 
   for user in users:
     if user != username:
-      distance = manhattan(users[user], users[username])
+      distance = minkowski(users[user], users[username], 2)
       distances.append((distance, user))
       
       # sort based on distance -- closest first
