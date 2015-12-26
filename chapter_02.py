@@ -1,3 +1,4 @@
+from chapter_02_recommender import recommender
 from math import sqrt 
 
 users = {
@@ -70,6 +71,27 @@ def pearson(rating1, rating2):
     return covar / (std_dev_x * std_dev_y)
 
 
+
+def cosine_similarity(rating1, rating2):
+  
+  dot_product = 0
+  sum_x_2   = 0
+  sum_y_2   = 0
+
+  for key in rating1:
+    sum_x_2   += (rating1[key] ** 2)
+    if key in rating2:
+      dot_product += (rating1[key] * rating2[key]) 
+
+  for key in rating2:
+    sum_y_2   += (rating2[key] ** 2)
+ 
+  x_vector_length = sqrt(sum_x_2)
+  y_vector_length = sqrt(sum_y_2)
+
+  return dot_product / (x_vector_length * y_vector_length)
+
+
 # Creates a sorted list of users based on their distance to username
 
 def computeNearestNeighbor(username, users):
@@ -113,23 +135,48 @@ def recommend(username, users):
 
 """ ========================== ACTUALLY RUNNING CODE HERE =============================== """
 
+print "\n\n"
 
 # %.3f formats the float to 3 decimal places
-print "The manhattan distance should be 2.0 => %.3f" % manhattan(users['Hailey'], users['Veronica'])
-print "The manhattan distance should be 7.5 => %.3f" % manhattan(users['Hailey'], users['Jordyn']) 
+print "The manhattan distance between Hailey and Veronica should be 2.0 => %.3f" % manhattan(users['Hailey'], users['Veronica'])
+print "The manhattan distance between Hailey and Jordyn should be 7.5 => %.3f" % manhattan(users['Hailey'], users['Jordyn']) 
 
-print "The computed Manhattan distances for Hailey are: \n %s" % computeNearestNeighbor("Hailey", users)
+print "The computed Manhattan distances for Hailey are: %s" % computeNearestNeighbor("Hailey", users)
 
-print "Recommended artists for Hailey are: \n %s" % recommend('Hailey', users) 
-print "Recommended artists for Chan are: \n %s" % recommend('Chan', users)
-print "Recommended artists for Sam are: \n %s" % recommend('Sam', users)
-print "Recommended artists for Angelica are: \n %s" % recommend('Angelica', users)
+print "\n\n"
+
+print "Recommended artists for Hailey are: %s" % recommend('Hailey', users) 
+print "Recommended artists for Chan are: %s" % recommend('Chan', users)
+print "Recommended artists for Sam are: %s" % recommend('Sam', users)
+print "Recommended artists for Angelica are: %s" % recommend('Angelica', users)
+
+print "\n\n"
 
 print "Pearson coefficient between Angelica and Bill is %.3f" % pearson(users['Angelica'], users['Bill']) 
 print "Pearson coefficient between Angelica and Hailey is %.3f" % pearson(users['Angelica'], users['Hailey']) 
 print "Pearson coefficient between Angelica and Jordyn is %.3f" % pearson(users['Angelica'], users['Jordyn']) 
 
+print "\n\n"
 
+print "Cosine similarity between Angelica and Veronica is %.3f" % cosine_similarity(users['Angelica'], users['Veronica'])
 
+print "\n\n"
 
+r = recommender(users)
+print "Jordyn's recommendations: %s" % r.recommend('Jordyn')
+print "Hailey's recommendations: %s" % r.recommend('Hailey')
 
+print "\n\n"
+
+print "Loading CSV book data."
+print "Result count: %s" % r.loadBookDB()
+
+print "\n\n"
+
+r.recommend('171118')
+
+print "\n\n"
+
+r.userRatings('171118', 5)
+
+print "\n\n"
