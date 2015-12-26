@@ -2,7 +2,134 @@ import codecs
 from math import sqrt
 
 
-class recommender:
+class DataLoader:
+
+
+    """ 
+    Initialize loader
+    """
+    def __init__(self, dataType='book'):
+
+        return None
+
+
+    """ 
+    Loads the BX book dataset. Path is where the BX files are located 
+    """
+    def loadBookDB(self, path='BX-Dump/'):
+        
+        bookDb = {}
+
+        bookDb['data'] = self.getBookRatings(path, "BX-Book-Ratings.csv")
+
+        bookDb['productid2name'] = self.getBookRecords(path, "BX-Books.csv")
+
+        userdata = self.getUserRecords(path, "BX-Users.csv")
+        bookDb['userid2name'] = userdata['userid2name']
+        bookDb['username2id'] = userdata['username2id']
+
+        return bookDb  
+
+
+    """
+    Description
+    """
+    def getBookRatings(self, path, filename):
+
+        # First load book ratings into self.data
+        data = {}
+        i = 0
+        
+        f = codecs.open(path + filename, 'r', 'utf8')
+        for line in f:
+            i += 1
+            #separate line into fields
+            fields = line.split(';')
+            user = fields[0].strip('"')
+            book = fields[1].strip('"')
+            rating = int(fields[2].strip().strip('"'))
+            
+            if user in data:
+                currentRatings = data[user]
+            else:
+                currentRatings = {}
+            currentRatings[book] = rating
+            data[user] = currentRatings
+        
+        f.close()
+
+        return data
+
+
+
+    # Now load books into self.productid2name
+    # Books contains isbn, title, and author among other fields
+    def getBookRecords(self, path, filename):
+
+        productid2name = {}
+        i = 0
+
+        f = codecs.open(path + filename, 'r', 'utf8')
+        
+        for line in f:
+            i += 1
+            #separate line into fields
+            fields = line.split(';')
+            isbn = fields[0].strip('"')
+            title = fields[1].strip('"')
+            author = fields[2].strip().strip('"')
+            title = title + ' by ' + author
+            productid2name[isbn] = title
+        
+        f.close()
+
+        return productid2name
+
+
+
+    #  Now load user info into both self.userid2name and self.username2id
+    def getUserRecords(self, path, filename):
+        
+        userdata = {
+            'userid2name': {},
+            'username2id': {}
+        }
+        
+        i = 0
+
+        f = codecs.open(path + filename, 'r', 'utf8')
+        
+        for line in f:
+            i += 1
+
+            #separate line into fields
+            fields = line.split(';')
+            userid = fields[0].strip('"')
+            location = fields[1].strip('"')
+            
+            if len(fields) > 3:
+                age = fields[2].strip().strip('"')
+            else:
+                age = 'NULL'
+            
+            if age != 'NULL':
+                value = location + '  (age: ' + age + ')'
+            else:
+                value = location
+            
+            userdata['userid2name'][userid] = value
+            userdata['username2id'][location] = userid
+        
+        f.close()
+
+        return userdata
+
+
+
+
+
+
+class Recommender:
 
 
     """ 
@@ -31,14 +158,6 @@ class recommender:
             self.data = data
 
 
-    """
-    Given product id number return product name 
-    """
-    def convertProductID2name(self, id):
-        if id in self.productid2name:
-            return self.productid2name[id]
-        else:
-            return id
 
 
     """ 
@@ -46,82 +165,18 @@ class recommender:
     """
     def userRatings(self, id, n):
 
-        print ("Ratings for " + self.userid2name[id])
         ratings = self.data[id]
         print(len(ratings))
         ratings = list(ratings.items())
-        ratings = [(self.convertProductID2name(k), v) for (k, v) in ratings]
         
         # finally sort and return
         ratings.sort(key = lambda artistTuple: artistTuple[1], reverse = True)
-        ratings = ratings[:n]
         
-        for rating in ratings:
-            print("%s\t%.1f" % (rating[0], rating[1]))
+        return ratings[:n]
         
 
-    """ 
-    Loads the BX book dataset. Path is where the BX files are located 
-    """
-    def loadBookDB(self, path='BX-Dump/'):
         
-        self.data = {}
-        i = 0
 
-        # First load book ratings into self.data
-        f = codecs.open(path + "BX-Book-Ratings.csv", 'r', 'utf8')
-        for line in f:
-            i += 1
-            #separate line into fields
-            fields = line.split(';')
-            user = fields[0].strip('"')
-            book = fields[1].strip('"')
-            rating = int(fields[2].strip().strip('"'))
-            if user in self.data:
-                currentRatings = self.data[user]
-            else:
-                currentRatings = {}
-            currentRatings[book] = rating
-            self.data[user] = currentRatings
-        f.close()
-
-        # Now load books into self.productid2name
-        # Books contains isbn, title, and author among other fields
-        f = codecs.open(path + "BX-Books.csv", 'r', 'utf8')
-        for line in f:
-            i += 1
-            #separate line into fields
-            fields = line.split(';')
-            isbn = fields[0].strip('"')
-            title = fields[1].strip('"')
-            author = fields[2].strip().strip('"')
-            title = title + ' by ' + author
-            self.productid2name[isbn] = title
-        f.close()
-
-        #  Now load user info into both self.userid2name and
-        #  self.username2id
-        f = codecs.open(path + "BX-Users.csv", 'r', 'utf8')
-        for line in f:
-            i += 1
-            #print(line)
-            #separate line into fields
-            fields = line.split(';')
-            userid = fields[0].strip('"')
-            location = fields[1].strip('"')
-            if len(fields) > 3:
-                age = fields[2].strip().strip('"')
-            else:
-                age = 'NULL'
-            if age != 'NULL':
-                value = location + '  (age: ' + age + ')'
-            else:
-                value = location
-            self.userid2name[userid] = value
-            self.username2id[location] = userid
-        f.close()
-        
-        return i   
 
     """
     Calculates Pearson coefficient
@@ -217,14 +272,9 @@ class recommender:
        
        # now make list from dictionary (converts book ids to actual titles)
        recommendations = list(recommendations.items())
-       recommendations = [(self.convertProductID2name(k), v) for (k, v) in recommendations]
 
        # finally sort (index 1 is rating) and return
        recommendations.sort(key = lambda artistTuple: artistTuple[1], reverse = True)
-
-       print "Recommendations:"
-       for recommendation in recommendations[:self.n]:
-          print("%s\t%.1f" % (recommendation[0], recommendation[1]))
 
        # Return the first n items
        return recommendations[:self.n]

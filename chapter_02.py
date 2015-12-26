@@ -1,4 +1,4 @@
-from chapter_02_recommender import recommender
+from chapter_02_recommender import Recommender, DataLoader
 from math import sqrt 
 
 users = {
@@ -133,9 +133,20 @@ def recommend(username, users):
 
 
 
+"""
+Given product id number return product name 
+"""
+def convertProductID2name(bookData, id):
+    if id in bookData['productid2name']:
+        return bookData['productid2name'][id]
+    else:
+        return id
+
+
 """ ========================== ACTUALLY RUNNING CODE HERE =============================== """
 
 print "\n\n"
+
 
 # %.3f formats the float to 3 decimal places
 print "The manhattan distance between Hailey and Veronica should be 2.0 => %.3f" % manhattan(users['Hailey'], users['Veronica'])
@@ -143,40 +154,68 @@ print "The manhattan distance between Hailey and Jordyn should be 7.5 => %.3f" %
 
 print "The computed Manhattan distances for Hailey are: %s" % computeNearestNeighbor("Hailey", users)
 
+
 print "\n\n"
+
 
 print "Recommended artists for Hailey are: %s" % recommend('Hailey', users) 
 print "Recommended artists for Chan are: %s" % recommend('Chan', users)
 print "Recommended artists for Sam are: %s" % recommend('Sam', users)
 print "Recommended artists for Angelica are: %s" % recommend('Angelica', users)
 
+
 print "\n\n"
+
 
 print "Pearson coefficient between Angelica and Bill is %.3f" % pearson(users['Angelica'], users['Bill']) 
 print "Pearson coefficient between Angelica and Hailey is %.3f" % pearson(users['Angelica'], users['Hailey']) 
 print "Pearson coefficient between Angelica and Jordyn is %.3f" % pearson(users['Angelica'], users['Jordyn']) 
 
+
 print "\n\n"
+
 
 print "Cosine similarity between Angelica and Veronica is %.3f" % cosine_similarity(users['Angelica'], users['Veronica'])
 
+
 print "\n\n"
 
-r = recommender(users)
+
+r = Recommender(users)
 print "Jordyn's recommendations: %s" % r.recommend('Jordyn')
 print "Hailey's recommendations: %s" % r.recommend('Hailey')
 
+
 print "\n\n"
+
 
 print "Loading CSV book data."
-print "Result count: %s" % r.loadBookDB()
+
+dl = DataLoader();
+bookData = dl.loadBookDB();
+
+print "Book Recommendations:"
+
+book_rec = Recommender(bookData['data'])
+recommendations = book_rec.recommend('171118')
+recommendations = [(convertProductID2name(bookData, k), v) for (k, v) in recommendations]
+
+for recommendation in recommendations:
+  print("%s\t%.1f" % (recommendation[0], recommendation[1]))
+
 
 print "\n\n"
 
-r.recommend('171118')
+
+print "Ratings for " + bookData['userid2name']['171118']
+
+ratings = book_rec.userRatings('171118', 5)
+ratings = [(convertProductID2name(bookData, k), v) for (k, v) in ratings]
+
+for rating in ratings:
+    print("%s\t%.1f" % (rating[0], rating[1]))
+
 
 print "\n\n"
 
-r.userRatings('171118', 5)
 
-print "\n\n"
