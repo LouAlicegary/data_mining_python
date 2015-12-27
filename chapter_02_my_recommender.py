@@ -14,7 +14,7 @@ class MyRecommender:
             self.fn = self.minkowski
         elif self.metric == 'manhattan':
             self.fn = self.manhattan
-        elif self.metric == 'cosine_similarity'
+        elif self.metric == 'cosine_similarity':
             self.fn = self.cosine_similarity
 
         self.data = {}

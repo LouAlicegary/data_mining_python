@@ -3,17 +3,13 @@ import codecs
 class DataLoader:
 
 
-    """ 
-    Initialize loader
-    """
+    # Initialize loader
     def __init__(self, dataType='book'):
 
         return None
 
 
-    """ 
-    Loads the BX book dataset. Path is where the BX files are located 
-    """
+    # Loads the BX book dataset. Path is where the BX files are located 
     def loadBookDB(self, path='BX-Dump/'):
         
         bookDb = {}
@@ -29,9 +25,50 @@ class DataLoader:
         return bookDb  
 
 
-    """
-    Description
-    """
+
+    # Loads the movie dataset
+    def loadMovieDB(self):
+        
+        path = 'Movie_Ratings/'
+        filename = 'Movie_Ratings.csv'
+
+        movieDb = {
+            'data': {}
+        }
+
+        line_counter = 0
+        header_array = []
+
+        f = codecs.open(path + filename, 'r', 'utf8')
+        for line in f:
+
+            # Grab headers containing usernames from first line of file
+            if line_counter == 0:
+                header_array = line.split(',') 
+                header_array = map(lambda x: x.strip().strip('""').strip('"'), header_array)
+                users = header_array[1:]
+                for user in users:
+                    movieDb['data'][user] = {}
+            else:
+                ratings = line.split(',')
+                movieTitle = ratings[0].strip('"')
+
+                # Only add rating for a movie that's actualy been rated (so no blank ratings)
+                # Get index of user in header array, read in rating from that column, and strip junk chars
+                for user in movieDb['data']:
+                    user_index = header_array.index(user)
+                    sanitized_rating = ratings[user_index].strip().strip('""').strip('"')
+                    if sanitized_rating: 
+                        movieDb['data'][user][movieTitle] = int(ratings[user_index]) 
+
+            line_counter += 1
+        
+        f.close()
+
+        return movieDb 
+
+
+    # Description
     def getBookRatings(self, path, filename):
 
         # First load book ratings into self.data

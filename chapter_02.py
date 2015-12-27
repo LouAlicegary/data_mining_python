@@ -30,11 +30,10 @@ def convertProductID2name(bookData, id):
 
 
 
-""" ========================== ACTUALLY RUNNING CODE HERE =============================== """
+########################## ========================== ACTUALLY RUNNING CODE HERE =============================== ################################
 
 
-
-
+# Testing my class(using Minkowski = 2)
 
 print "\n\n"
 
@@ -74,6 +73,9 @@ print "Cosine similarity between Angelica and Veronica is %.3f" % my_rec.cosine_
 print "\n\n"
 
 
+
+# Testing author's class (using Pearson)
+
 pearson_rec = Recommender(users)
 
 print "Jordyn's recommendations: %s" % pearson_rec.recommend('Jordyn')
@@ -88,6 +90,11 @@ print "Hailey's recommendations: %s" % r.recommend('Hailey')
 
 print "\n\n"
 
+
+
+
+
+# Testing BX Book import and recommendations
 
 print "Loading CSV book data."
 
@@ -124,3 +131,28 @@ for rating in ratings:
 print "\n\n"
 
 
+
+
+
+# Testing movieimport and recommendations
+
+print "Loading CSV movie data."
+
+dl = DataLoader();
+movieData = dl.loadMovieDB();
+
+
+print "\n\n"
+
+
+movie_rec = Recommender(movieData['data'], 3)
+
+print "Zak's movie recommendations:"
+
+recommendations = movie_rec.recommend('Zak')
+
+for recommendation in recommendations:
+    print("%s\t%.1f" % (recommendation[0], recommendation[1]))
+
+
+print "\n\n"

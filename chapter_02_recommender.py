@@ -1,16 +1,15 @@
 from math import sqrt
+import pprint # pprint.PrettyPrinter(indent=4).pprint(<object_to_print>)
 
 class Recommender:
 
 
-    """ 
-    Initialize recommender
-    Currently, if data is dictionary the recommender is initialized to it.
-    For all other data types of data, no initialization occurs.
-    * k is the k value for k nearest neighbor
-    * metric is which distance formula to use
-    * n is the maximum number of recommendations to make 
-    """
+    # Initialize recommender
+    # Currently, if data is dictionary the recommender is initialized to it.
+    # For all other data types of data, no initialization occurs.
+    # * k is the k value for k nearest neighbor
+    # * metric is which distance formula to use
+    # * n is the maximum number of recommendations to make 
     def __init__(self, data, k=1, metric='pearson', n=5):
 
         self.k = k
@@ -25,15 +24,11 @@ class Recommender:
             self.data = data
 
 
-
-
-    """ 
-    Return n top ratings for user with id 
-    """
+    # Return n top ratings for user with id 
     def userRatings(self, id, n):
 
         ratings = self.data[id]
-        print(len(ratings))
+
         ratings = list(ratings.items())
         
         # finally sort and return
@@ -42,12 +37,7 @@ class Recommender:
         return ratings[:n]
         
 
-        
-
-
-    """
-    Calculates Pearson coefficient
-    """
+    # Calculates Pearson coefficient
     def pearson(self, rating1, rating2):
         
         sum_xy = 0
@@ -80,12 +70,11 @@ class Recommender:
             return (sum_xy - (sum_x * sum_y) / n) / denominator
 
 
-    """ 
-    Creates a sorted list of users based on their distance to username 
-    """
+    # Creates a sorted list of users based on their distance to username 
     def computeNearestNeighbor(self, username):
-
+        
         distances = []
+        
         for instance in self.data:
             if instance != username:
                 distance = self.fn(self.data[username], self.data[instance])
@@ -97,9 +86,7 @@ class Recommender:
         return distances
 
     
-    """ 
-    Give list of recommendations 
-    """
+    # Give list of recommendations 
     def recommend(self, user):
 
        recommendations = {}
@@ -124,10 +111,10 @@ class Recommender:
           
           # get the name of the person
           name = nearest[i][0]
-          
+
           # get the ratings for this person
           neighborRatings = self.data[name]
-          
+
           # get the name of the person
           # now find bands neighbor rated that user didn't
           for artist in neighborRatings:
