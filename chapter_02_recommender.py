@@ -17,10 +17,6 @@ class Recommender:
         self.metric = metric
         self.n = n
         
-        self.username2id = {}
-        self.userid2name = {}
-        self.productid2name = {}
-        
         if self.metric == 'pearson':
             self.fn = self.pearson
 

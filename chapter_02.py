@@ -51,10 +51,10 @@ print "The computed Manhattan distances for Hailey are: %s" % my_rec.computeNear
 print "\n\n"
 
 
-print "Recommended artists for Hailey are: %s" % my_rec.recommend('Hailey', users) 
-print "Recommended artists for Chan are: %s" % my_rec.recommend('Chan', users)
-print "Recommended artists for Sam are: %s" % my_rec.recommend('Sam', users)
-print "Recommended artists for Angelica are: %s" % my_rec.recommend('Angelica', users)
+print "Recommended artists for Hailey are: %s" % my_rec.recommend('Hailey') 
+print "Recommended artists for Chan are: %s" % my_rec.recommend('Chan')
+print "Recommended artists for Sam are: %s" % my_rec.recommend('Sam')
+print "Recommended artists for Angelica are: %s" % my_rec.recommend('Angelica')
 
 
 print "\n\n"
@@ -72,6 +72,12 @@ print "Cosine similarity between Angelica and Veronica is %.3f" % my_rec.cosine_
 
 
 print "\n\n"
+
+
+pearson_rec = Recommender(users)
+
+print "Jordyn's recommendations: %s" % pearson_rec.recommend('Jordyn')
+print "Hailey's recommendations: %s" % pearson_rec.recommend('Hailey')
 
 
 r = Recommender(users)

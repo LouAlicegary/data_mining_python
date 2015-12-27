@@ -4,9 +4,66 @@ from math import sqrt
 class MyRecommender:
 
 
-    def __init__(self, userData):
+    def __init__(self, userData, metric='minkowski'):
 
-        return None
+        # Determines which metric of calculating distance to use
+        self.metric = metric
+        if self.metric == 'pearson':
+            self.fn = self.pearson
+        elif self.metric == 'minkowski':
+            self.fn = self.minkowski
+        elif self.metric == 'manhattan':
+            self.fn = self.manhattan
+        elif self.metric == 'cosine_similarity'
+            self.fn = self.cosine_similarity
+
+        self.data = {}
+        if type(userData).__name__ == 'dict':
+            self.data = userData
+        
+
+    # Give list of recommendations
+    def recommend(self, username):
+     
+      users = self.data
+
+      recommendations = []
+
+      # grab username's ratings
+      userRatings = users[username]
+
+      # find nearest neighbor and grab all their ratings
+      nearest = self.computeNearestNeighbor(username, users)[0][1]
+      neighborRatings = users[nearest]
+
+      # now find bands neighbor rated that user didn't and append to rec list
+      for artist in neighborRatings:
+        if not artist in userRatings:
+          recommendations.append((artist, neighborRatings[artist]))
+     
+      # (author note: using the fn sorted for variety - sort is more efficient)
+      # key is an anonymous (lambda) function whose name (artistTuple) 
+      # represents each object in the collection being sorted
+      return sorted(recommendations, key=lambda artistTuple: artistTuple[1], reverse = True)
+
+
+    # Creates a sorted list of users based on their distance to username
+
+    def computeNearestNeighbor(self, username, users):
+
+      distances = []
+
+      for user in users:
+        if user != username:
+          distance = self.fn(users[user], users[username], 2)
+          distances.append((distance, user))
+          
+          # sort based on distance -- closest first
+          distances.sort()
+     
+      return distances
+
+
 
     # Computes the Manhattan distance. Both rating1 and rating2 are dictionaries of the form
     # {'The Strokes': 3.0, 'Slightly Stoopid': 2.5 ...}
@@ -36,6 +93,7 @@ class MyRecommender:
           distance += pow(abs(rating1[key] - rating2[key]), r)
      
       return pow(distance, 1/r)
+
 
 
     def pearson(self, rating1, rating2):
@@ -86,41 +144,5 @@ class MyRecommender:
       return dot_product / (x_vector_length * y_vector_length)
 
 
-    # Creates a sorted list of users based on their distance to username
-
-    def computeNearestNeighbor(self, username, users):
-
-      distances = []
-
-      for user in users:
-        if user != username:
-          distance = self.minkowski(users[user], users[username], 2)
-          distances.append((distance, user))
-          
-          # sort based on distance -- closest first
-          distances.sort()
-     
-      return distances
 
 
-    # Give list of recommendations
-    def recommend(self, username, users):
-     
-      recommendations = []
-
-      # grab username's ratings
-      userRatings = users[username]
-
-      # find nearest neighbor and grab all their ratings
-      nearest = self.computeNearestNeighbor(username, users)[0][1]
-      neighborRatings = users[nearest]
-
-      # now find bands neighbor rated that user didn't and append to rec list
-      for artist in neighborRatings:
-        if not artist in userRatings:
-          recommendations.append((artist, neighborRatings[artist]))
-     
-      # (author note: using the fn sorted for variety - sort is more efficient)
-      # key is an anonymous (lambda) function whose name (artistTuple) 
-      # represents each object in the collection being sorted
-      return sorted(recommendations, key=lambda artistTuple: artistTuple[1], reverse = True)
